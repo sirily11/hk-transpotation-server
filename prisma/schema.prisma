@@ -1,0 +1,41 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Company {
+  id   String @id @default(auto()) @map("_id") @db.ObjectId
+  name String
+
+  /// The routes that this company has
+  Routes Route[]
+}
+
+model Route {
+  id   String @id @default(auto()) @map("_id") @db.ObjectId
+  name String
+
+  company   Company @relation(fields: [companyId], references: [id])
+  companyId String  @db.ObjectId
+
+  /// The stops that this route has
+  Stops   Stop[]   @relation(references: [id], fields: [stopIds])
+  stopIds String[] @db.ObjectId
+}
+
+model Stop {
+  id   String @id @default(auto()) @map("_id") @db.ObjectId
+  /// The name of the stop
+  name String
+
+  /// The routes that this stop has
+  Routes   Route[]  @relation(references: [id], fields: [routeIds])
+  routeIds String[] @db.ObjectId
+}
